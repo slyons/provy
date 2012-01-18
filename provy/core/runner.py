@@ -10,10 +10,13 @@ from provy.core.errors import ConfigurationError
 from jinja2 import FileSystemLoader, ChoiceLoader
 
 
-def run(provfile_path, server_name, password, extra_options):
+def run(provfile_path, server_name, password, extra_options, serverConfig=None):
     module_path = provfile_path.replace(sep, '.')
     prov = import_module(module_path)
-    servers = get_servers_for(prov, server_name)
+    if callable(serverConfig):
+        servers = serverConfig()
+    else:
+        servers = serverConfig if serverConfig else get_servers_for(prov, server_name)
 
     for server in servers:
         if 'options' in server:
